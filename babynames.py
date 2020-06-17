@@ -44,7 +44,28 @@ def extract_names(filename):
     ['2006', 'Aaliyah 91', 'Aaron 57', 'Abagail 895', ...]
     """
     names = []
+    names_disct = {}
     # +++your code here+++
+    with open(filename) as file:
+        data = file.read()
+        pattern = re.compile(r'Popularity in')
+        matches = pattern.finditer(data)
+        for match in matches:
+            year = match.span()
+            names.append(data[year[1]:][1:5])
+
+    with open(filename) as file_name:
+        for line in file_name:
+            rank_name = re.findall(
+                f'"right"><td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>', line)
+            for name in rank_name:
+                if not name[1] in names_disct:
+                    names_disct[name[1]] = name[0]
+                if not name[2] in names_disct:
+                    names_disct[name[2]] = name[0]
+    for key in sorted(names_disct):
+        names.append(key + " " + names_disct[key])
+
     return names
 
 
@@ -71,7 +92,6 @@ def main(args):
     if not ns:
         parser.print_usage()
         sys.exit(1)
-
     file_list = ns.files
 
     # option flag
@@ -83,6 +103,21 @@ def main(args):
     # or to write the list to a summary file (e.g. `baby1990.html.summary`).
 
     # +++your code here+++
+    for file in file_list:
+        name_output = extract_names(file)
+        # print("-"*40)
+        # print(create_summary)
+        # print("-"*40)
+        name_output = "\n".join(name_output)
+        if not create_summary:
+            print(name_output)
+        else:
+            new_file = file + ".summary"
+            file = open(new_file, "w")
+            file.write(str(name_output))
+    # print("-"*40)
+    # print(create_summary)
+    # print("-"*40)
 
 
 if __name__ == '__main__':
